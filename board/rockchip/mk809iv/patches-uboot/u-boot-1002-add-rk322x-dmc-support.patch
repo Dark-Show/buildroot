@@ -1,0 +1,491 @@
+From 5d49fe5d195de506708f58d2feda410eca526d65 Mon Sep 17 00:00:00 2001
+From: Alex Bee <knaerzche@gmail.com>
+Date: Thu, 10 Sep 2020 12:20:03 +0200
+Subject: [PATCH] rockchip: rk322x: add dmc support
+
+Signed-off-by: Alex Bee <knaerzche@gmail.com>
+---
+ arch/arm/dts/rk322x-dram-default-timing.dtsi |  34 +++++
+ arch/arm/mach-rockchip/rk322x/Kconfig        |   6 +-
+ board/rockchip/box_rk322x/Kconfig            |  15 +++
+ board/rockchip/box_rk322x/Makefile           |   7 ++
+ board/rockchip/box_rk322x/box_rk322x.c       |  36 ++++++
+ drivers/ram/rockchip/rockchip_dmc.c          | 125 +++++++++++++++++++
+ drivers/ram/rockchip/sdram_rk322x.c          |   6 +-
+ include/configs/box_rk322x.h                 |  28 +++++
+ include/dt-bindings/dram/rockchip,rk322x.h   |  90 +++++++++++++
+ 9 files changed, 343 insertions(+), 4 deletions(-)
+ create mode 100644 arch/arm/dts/rk322x-dram-default-timing.dtsi
+ create mode 100644 board/rockchip/box_rk322x/Kconfig
+ create mode 100644 board/rockchip/box_rk322x/Makefile
+ create mode 100644 board/rockchip/box_rk322x/box_rk322x.c
+ create mode 100644 include/configs/box_rk322x.h
+ create mode 100644 include/dt-bindings/dram/rockchip,rk322x.h
+
+diff --git a/arch/arm/dts/rk322x-dram-default-timing.dtsi b/arch/arm/dts/rk322x-dram-default-timing.dtsi
+new file mode 100644
+index 0000000000..15b94ece99
+--- /dev/null
++++ b/arch/arm/dts/rk322x-dram-default-timing.dtsi
+@@ -0,0 +1,34 @@
++/*
++ * Copyright (c) 2018 Fuzhou Rockchip Electronics Co., Ltd
++ *
++ * SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++ */
++
++#include <dt-bindings/dram/rockchip,rk322x.h>
++
++/ {
++	dram_timing: dram_timing {
++		compatible = "rockchip,dram-timing";
++		dram_spd_bin = <21>; /* DDR3_DEFAULT */
++		sr_idle = <0x18>;
++		pd_idle = <0x20>;
++		dram_dll_disb_freq = <300>;
++		phy_dll_disb_freq = <400>;
++		dram_odt_disb_freq = <333>;
++		phy_odt_disb_freq = <333>;
++		ddr3_drv = <DDR3_DS_40ohm>;
++		ddr3_odt = <DDR3_ODT_120ohm>;
++		lpddr3_drv = <LP3_DS_34ohm>;
++		lpddr3_odt = <LP3_ODT_240ohm>;
++		lpddr2_drv = <LP2_DS_34ohm>;
++		/* lpddr2 not supported odt */
++		phy_ddr3_clk_drv = <PHY_DDR3_RON_RTT_45ohm>;
++		phy_ddr3_cmd_drv = <PHY_DDR3_RON_RTT_45ohm>;
++		phy_ddr3_dqs_drv = <PHY_DDR3_RON_RTT_34ohm>;
++		phy_ddr3_odt = <PHY_DDR3_RON_RTT_225ohm>;
++		phy_lp23_clk_drv = <PHY_LP23_RON_RTT_43ohm>;
++		phy_lp23_cmd_drv = <PHY_LP23_RON_RTT_34ohm>;
++		phy_lp23_dqs_drv = <PHY_LP23_RON_RTT_34ohm>;
++		phy_lp3_odt = <PHY_LP23_RON_RTT_240ohm>;
++	};
++};
+diff --git a/arch/arm/mach-rockchip/rk322x/Kconfig b/arch/arm/mach-rockchip/rk322x/Kconfig
+index eebe63131d..8b1d809073 100644
+--- a/arch/arm/mach-rockchip/rk322x/Kconfig
++++ b/arch/arm/mach-rockchip/rk322x/Kconfig
+@@ -1,5 +1,9 @@
+ if ROCKCHIP_RK322X
+ 
++config TARGET_BOX_RK322X
++        bool "BOX_RK322X"
++        select BOARD_LATE_INIT
++
+ config TARGET_EVB_RK3229
+ 	bool "EVB_RK3229"
+ 	select BOARD_LATE_INIT
+@@ -19,7 +23,7 @@ config SYS_MALLOC_F_LEN
+ 
+ config SPL_SERIAL_SUPPORT
+ 	default y
+-
++source "board/rockchip/box_rk322x/Kconfig"
+ source "board/rockchip/evb_rk3229/Kconfig"
+ source "board/rockchip/gva_rk3229/Kconfig"
+ 
+diff --git a/board/rockchip/box_rk322x/Kconfig b/board/rockchip/box_rk322x/Kconfig
+new file mode 100644
+index 0000000000..12086fbeb3
+--- /dev/null
++++ b/board/rockchip/box_rk322x/Kconfig
+@@ -0,0 +1,15 @@
++if TARGET_BOX_RK322X
++
++config SYS_BOARD
++	default "box_rk322x"
++
++config SYS_VENDOR
++	default "rockchip"
++
++config SYS_CONFIG_NAME
++	default "box_rk322x"
++
++config BOARD_SPECIFIC_OPTIONS # dummy
++	def_bool y
++
++endif
+diff --git a/board/rockchip/box_rk322x/Makefile b/board/rockchip/box_rk322x/Makefile
+new file mode 100644
+index 0000000000..decb29fa5f
+--- /dev/null
++++ b/board/rockchip/box_rk322x/Makefile
+@@ -0,0 +1,7 @@
++#
++# (C) Copyright 2015 Google, Inc
++#
++# SPDX-License-Identifier:     GPL-2.0+
++#
++
++obj-y	+= box_rk322x.o
+diff --git a/board/rockchip/box_rk322x/box_rk322x.c b/board/rockchip/box_rk322x/box_rk322x.c
+new file mode 100644
+index 0000000000..a012cfa091
+--- /dev/null
++++ b/board/rockchip/box_rk322x/box_rk322x.c
+@@ -0,0 +1,36 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd
++ *
++ * SPDX-License-Identifier:     GPL-2.0+
++ */
++
++#include <common.h>
++#include <dm.h>
++#include <asm/io.h>
++#include <asm/arch/uart.h>
++#include <dm/uclass-internal.h>
++#if defined(CONFIG_ROCKCHIP_DMC)
++#include <asm/arch/rockchip_dmc.h>
++#endif
++
++DECLARE_GLOBAL_DATA_PTR;
++
++int rk_board_late_init(void)
++{
++	int ret=0;
++#if !defined(CONFIG_SPL_BUILD) && defined(CONFIG_ROCKCHIP_DMC)
++	struct udevice *dev;
++
++	ret = uclass_get_device(UCLASS_RAM, 0, &dev);
++        if (ret) {
++                debug("RK322X box failed to get dmc device: %d\n", ret);
++                return ret;
++        }
++
++	ret = rockchip_dmcfreq_probe(dev);
++	if (ret)
++                debug("RK322X box probe dmc failed: %d\n", ret);
++#endif
++
++	return ret;
++}
+diff --git a/drivers/ram/rockchip/rockchip_dmc.c b/drivers/ram/rockchip/rockchip_dmc.c
+index d7fddb668b..98508db49d 100644
+--- a/drivers/ram/rockchip/rockchip_dmc.c
++++ b/drivers/ram/rockchip/rockchip_dmc.c
+@@ -42,6 +42,52 @@ struct share_params {
+ 
+ static struct share_params *ddr_psci_param;
+ 
++static const char * const rk3228_dts_timing[] = {
++	"dram_spd_bin",
++	"sr_idle",
++	"pd_idle",
++	"dram_dll_disb_freq",
++	"phy_dll_disb_freq",
++	"dram_odt_disb_freq",
++	"phy_odt_disb_freq",
++	"ddr3_drv",
++	"ddr3_odt",
++	"lpddr3_drv",
++	"lpddr3_odt",
++	"lpddr2_drv",
++	"phy_ddr3_clk_drv",
++	"phy_ddr3_cmd_drv",
++	"phy_ddr3_dqs_drv",
++	"phy_ddr3_odt",
++	"phy_lp23_clk_drv",
++	"phy_lp23_cmd_drv",
++	"phy_lp23_dqs_drv",
++	"phy_lp3_odt"
++};
++
++struct rk3228_ddr_dts_config_timing {
++	unsigned int dram_spd_bin;
++	unsigned int sr_idle;
++	unsigned int pd_idle;
++	unsigned int dram_dll_dis_freq;
++	unsigned int phy_dll_dis_freq;
++	unsigned int dram_odt_dis_freq;
++	unsigned int phy_odt_dis_freq;
++	unsigned int ddr3_drv;
++	unsigned int ddr3_odt;
++	unsigned int lpddr3_drv;
++	unsigned int lpddr3_odt;
++	unsigned int lpddr2_drv;
++	unsigned int phy_ddr3_clk_drv;
++	unsigned int phy_ddr3_cmd_drv;
++	unsigned int phy_ddr3_dqs_drv;
++	unsigned int phy_ddr3_odt;
++	unsigned int phy_lp23_clk_drv;
++	unsigned int phy_lp23_cmd_drv;
++	unsigned int phy_lp23_dqs_drv;
++	unsigned int phy_lp3_odt;
++};
++
+ /* hope this define can adapt all future platfor */
+ static const char * const rk3328_dts_timing[] = {
+ 	"ddr3_speed_bin",
+@@ -624,6 +670,38 @@ static void px30_de_skew_set_2_reg(struct rk3328_ddr_de_skew_setting *de_skew,
+ 	}
+ }
+ 
++static int of_get_rk3228_timings(struct udevice *dev, uint32_t *timing)
++{
++	struct device_node *np_tim;
++	struct rk3228_ddr_dts_config_timing *dts_timing;
++	u32 *p;
++	int ret = 0;
++	u32 i;
++
++	dts_timing =
++		(struct rk3228_ddr_dts_config_timing *)(timing +
++							DTS_PAR_OFFSET / 4);
++
++	np_tim = of_parse_phandle(ofnode_to_np(dev_ofnode(dev)),
++				   "ddr_timing", 0);
++	if (!np_tim) {
++		ret = -EINVAL;
++		goto end;
++	}
++
++	p = (u32 *)dts_timing;
++	for (i = 0; i < ARRAY_SIZE(rk3228_dts_timing); i++) {
++		ret |= ofnode_read_u32(np_to_ofnode(np_tim), rk3228_dts_timing[i],
++					p + i);
++	}
++end:
++	if (ret)
++		printf("of_get_rk3228_timings: failed\n");
++
++	return ret;
++
++}
++
+ static void of_get_rk3328_timings(struct udevice *dev, uint32_t *timing)
+ {
+ 	struct device_node *np_tim;
+@@ -730,6 +808,51 @@ end:
+ 	}
+ }
+ 
++static __maybe_unused int rk3228_devfreq_init(struct udevice *dev)
++{
++	struct arm_smccc_res res;
++	u32 size, dram_frequency;
++	int ret;
++
++	ret = sip_smc_set_sip_version(SIP_IMPLEMENT_V2);
++	if(ret) {
++		dev_err(&pdev->dev, "Failed to set SIP Version 2\n");
++                return -ENOMEM;
++	}
++
++	size = sizeof(struct rk3228_ddr_dts_config_timing);
++	res = sip_smc_request_share_mem(DIV_ROUND_UP(size, 4096) + 1,
++			SHARE_PAGE_TYPE_DDR);
++
++	if (res.a0) {
++		dev_err(&pdev->dev, "no ATF memory for init\n");
++		return -ENOMEM;
++	}
++
++	ddr_psci_param = (struct share_params *)res.a1;
++	if (of_get_rk3228_timings(dev, (uint32_t *)ddr_psci_param))
++		return -ENOMEM;
++
++	flush_cache((unsigned long)ddr_psci_param,
++		    (DIV_ROUND_UP(size, 4096) + 1) * 0x1000);
++
++	ddr_psci_param->hz = 0;
++	res = sip_smc_dram(SHARE_PAGE_TYPE_DDR, 0,
++			   ROCKCHIP_SIP_CONFIG_DRAM_INIT);
++
++	if (res.a0) {
++		printf("rockchip_sip_config_dram_init error:%lx\n",
++		       res.a0);
++		return -ENOMEM;
++	}
++
++	dram_frequency = dev_read_u32_default(dev, "dram_frequency", 300000000);
++	set_ddr_freq(dram_frequency);
++
++	return 0;
++
++}
++
+ static __maybe_unused int rk3328_devfreq_init(struct udevice *dev)
+ {
+ 	struct arm_smccc_res res;
+@@ -889,6 +1012,8 @@ int rockchip_dmcfreq_probe(struct udevice *dev)
+ 	ret = px30_devfreq_init(dev);
+ #elif defined(CONFIG_ROCKCHIP_RK3328)
+ 	ret = rk3328_devfreq_init(dev);
++#elif defined(CONFIG_ROCKCHIP_RK322X)
++	ret = rk3228_devfreq_init(dev);
+ #else
+ 	ret = -1;
+ 	printf("Unsupported chip type\n");
+diff --git a/drivers/ram/rockchip/sdram_rk322x.c b/drivers/ram/rockchip/sdram_rk322x.c
+index 76f3aca6b9..b9e003cc35 100644
+--- a/drivers/ram/rockchip/sdram_rk322x.c
++++ b/drivers/ram/rockchip/sdram_rk322x.c
+@@ -15,6 +15,7 @@
+ #include <asm/arch/clock.h>
+ #include <asm/arch/cru_rk322x.h>
+ #include <asm/arch/grf_rk322x.h>
++#include <asm/arch/rockchip_dmc.h>
+ #include <asm/arch/hardware.h>
+ #include <asm/arch/sdram_rk322x.h>
+ #include <asm/arch/uart.h>
+@@ -776,9 +777,9 @@ static int conv_of_platdata(struct udevice *dev)
+ 
+ static int rk322x_dmc_probe(struct udevice *dev)
+ {
++	int ret = 0;
+ #ifdef CONFIG_TPL_BUILD
+ 	struct rk322x_sdram_params *plat = dev_get_platdata(dev);
+-	int ret;
+ 	struct udevice *dev_clk;
+ #endif
+ 	struct dram_info *priv = dev_get_priv(dev);
+@@ -814,13 +815,12 @@ static int rk322x_dmc_probe(struct udevice *dev)
+ 			(phys_addr_t)&priv->grf->os_reg[2]);
+ #endif
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ static int rk322x_dmc_get_info(struct udevice *dev, struct ram_info *info)
+ {
+ 	struct dram_info *priv = dev_get_priv(dev);
+-
+ 	*info = priv->info;
+ 
+ 	return 0;
+diff --git a/include/configs/box_rk322x.h b/include/configs/box_rk322x.h
+new file mode 100644
+index 0000000000..db1a843e80
+--- /dev/null
++++ b/include/configs/box_rk322x.h
+@@ -0,0 +1,28 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd
++ *
++ * SPDX-License-Identifier:     GPL-2.0+
++ */
++
++#ifndef __RK322X_CONFIG_H
++#define __RK322X_CONFIG_H
++
++#include <configs/rk322x_common.h>
++
++#define ROCKCHIP_DEVICE_SETTINGS \
++		"stdout=serial,vidconsole\0" \
++		"stderr=serial,vidconsole\0"
++
++/* Store env in emmc */
++#define CONFIG_SYS_MMC_ENV_DEV          0
++#define CONFIG_SYS_MMC_ENV_PART         0
++#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
++#define CONFIG_SUPPORT_EMMC_RPMB
++
++#ifndef CONFIG_SPL_BUILD
++
++#undef CONFIG_BOOTCOMMAND
++#define CONFIG_BOOTCOMMAND RKIMG_BOOTCOMMAND
++#endif
++
++#endif
+diff --git a/include/dt-bindings/dram/rockchip,rk322x.h b/include/dt-bindings/dram/rockchip,rk322x.h
+new file mode 100644
+index 0000000000..1ab3317d70
+--- /dev/null
++++ b/include/dt-bindings/dram/rockchip,rk322x.h
+@@ -0,0 +1,90 @@
++/*
++ * Copyright (c) 2018 Fuzhou Rockchip Electronics Co., Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0+
++ */
++
++#ifndef _DT_BINDINGS_DRAM_ROCKCHIP_RK322X_H
++#define _DT_BINDINGS_DRAM_ROCKCHIP_RK322X_H
++
++#define DDR3_DS_34ohm		(1 << 1)
++#define DDR3_DS_40ohm		(0x0)
++
++#define LP2_DS_34ohm		(0x1)
++#define LP2_DS_40ohm		(0x2)
++#define LP2_DS_48ohm		(0x3)
++#define LP2_DS_60ohm		(0x4)
++#define LP2_DS_68_6ohm		(0x5)/* optional */
++#define LP2_DS_80ohm		(0x6)
++#define LP2_DS_120ohm		(0x7)/* optional */
++
++#define LP3_DS_34ohm		(0x1)
++#define LP3_DS_40ohm		(0x2)
++#define LP3_DS_48ohm		(0x3)
++#define LP3_DS_60ohm		(0x4)
++#define LP3_DS_80ohm		(0x6)
++#define LP3_DS_34D_40U		(0x9)
++#define LP3_DS_40D_48U		(0xa)
++#define LP3_DS_34D_48U		(0xb)
++
++#define DDR3_ODT_DIS		(0)
++#define DDR3_ODT_40ohm		((1 << 2) | (1 << 6))
++#define DDR3_ODT_60ohm		(1 << 2)
++#define DDR3_ODT_120ohm		(1 << 6)
++
++#define LP3_ODT_DIS		(0)
++#define LP3_ODT_60ohm		(1)
++#define LP3_ODT_120ohm		(2)
++#define LP3_ODT_240ohm		(3)
++
++#define PHY_DDR3_RON_RTT_DISABLE	(0)
++#define PHY_DDR3_RON_RTT_451ohm		(1)
++#define PHY_DDR3_RON_RTT_225ohm		(2)
++#define PHY_DDR3_RON_RTT_150ohm		(3)
++#define PHY_DDR3_RON_RTT_112ohm		(4)
++#define PHY_DDR3_RON_RTT_90ohm		(5)
++#define PHY_DDR3_RON_RTT_75ohm		(6)
++#define PHY_DDR3_RON_RTT_64ohm		(7)
++#define PHY_DDR3_RON_RTT_56ohm		(16)
++#define PHY_DDR3_RON_RTT_50ohm		(17)
++#define PHY_DDR3_RON_RTT_45ohm		(18)
++#define PHY_DDR3_RON_RTT_41ohm		(19)
++#define PHY_DDR3_RON_RTT_37ohm		(20)
++#define PHY_DDR3_RON_RTT_34ohm		(21)
++#define PHY_DDR3_RON_RTT_33ohm		(22)
++#define PHY_DDR3_RON_RTT_30ohm		(23)
++#define PHY_DDR3_RON_RTT_28ohm		(24)
++#define PHY_DDR3_RON_RTT_26ohm		(25)
++#define PHY_DDR3_RON_RTT_25ohm		(26)
++#define PHY_DDR3_RON_RTT_23ohm		(27)
++#define PHY_DDR3_RON_RTT_22ohm		(28)
++#define PHY_DDR3_RON_RTT_21ohm		(29)
++#define PHY_DDR3_RON_RTT_20ohm		(30)
++#define PHY_DDR3_RON_RTT_19ohm		(31)
++
++#define PHY_LP23_RON_RTT_DISABLE	(0)
++#define PHY_LP23_RON_RTT_480ohm		(1)
++#define PHY_LP23_RON_RTT_240ohm		(2)
++#define PHY_LP23_RON_RTT_160ohm		(3)
++#define PHY_LP23_RON_RTT_120ohm		(4)
++#define PHY_LP23_RON_RTT_96ohm		(5)
++#define PHY_LP23_RON_RTT_80ohm		(6)
++#define PHY_LP23_RON_RTT_68ohm		(7)
++#define PHY_LP23_RON_RTT_60ohm		(16)
++#define PHY_LP23_RON_RTT_53ohm		(17)
++#define PHY_LP23_RON_RTT_48ohm		(18)
++#define PHY_LP23_RON_RTT_43ohm		(19)
++#define PHY_LP23_RON_RTT_40ohm		(20)
++#define PHY_LP23_RON_RTT_37ohm		(21)
++#define PHY_LP23_RON_RTT_34ohm		(22)
++#define PHY_LP23_RON_RTT_32ohm		(23)
++#define PHY_LP23_RON_RTT_30ohm		(24)
++#define PHY_LP23_RON_RTT_28ohm		(25)
++#define PHY_LP23_RON_RTT_26ohm		(26)
++#define PHY_LP23_RON_RTT_25ohm		(27)
++#define PHY_LP23_RON_RTT_24ohm		(28)
++#define PHY_LP23_RON_RTT_22ohm		(29)
++#define PHY_LP23_RON_RTT_21ohm		(30)
++#define PHY_LP23_RON_RTT_20ohm		(31)
++
++#endif /* _DT_BINDINGS_DRAM_ROCKCHIP_RK322X_H */
+-- 
+2.25.1
+

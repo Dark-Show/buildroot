@@ -1,0 +1,29 @@
+From a2ed3a2130fdb938ecc2eb688bf13bdf3065d86b Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Wed, 10 Jan 2018 19:56:16 +0100
+Subject: [PATCH] rk3328-evb: fix sdmmc vmmc-supply
+
+---
+ arch/arm/dts/rk3328-evb.dts | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/dts/rk3328-evb.dts b/arch/arm/dts/rk3328-evb.dts
+index 06d90e2318..18049a6f36 100644
+--- a/arch/arm/dts/rk3328-evb.dts
++++ b/arch/arm/dts/rk3328-evb.dts
+@@ -41,8 +41,10 @@
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "vcc3v3";
+ 		gpio = <&gpio0 30 GPIO_ACTIVE_LOW>;
+-		regulator-always-on;
+-		regulator-boot-on;
++		pinctrl-names = "default";
++		pinctrl-0 = <&sdmmc0m1_gpio>;
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
+ 	};
+ 
+ 	vcc5v0_otg: vcc5v0-otg-drv {
+-- 
+2.25.1
+

@@ -1,0 +1,1486 @@
+From e2fb8d6f724b32ade26957e8927f14f4698611fd Mon Sep 17 00:00:00 2001
+From: Alex Bee <knaerzche@gmail.com>
+Date: Thu, 10 Sep 2020 12:46:11 +0200
+Subject: [PATCH] rockchip: add rk322x box targets
+
+Signed-off-by: Alex Bee <knaerzche@gmail.com>
+---
+ arch/arm/dts/rk322x-box-a95xr1.dts            |  44 +++++
+ arch/arm/dts/rk322x-box-emmc-dmc.dts          |  33 ++++
+ arch/arm/dts/rk322x-box-emmc.dts              |  28 +++
+ arch/arm/dts/rk322x-box-mkv809vii.dts         |  37 ++++
+ arch/arm/dts/rk322x-box-mxq4k.dts             |  43 +++++
+ arch/arm/dts/rk322x-box-nand-dmc.dts          |  32 ++++
+ arch/arm/dts/rk322x-box-nand.dts              |  27 +++
+ arch/arm/dts/rk322x-box.dtsi                  | 177 ++++++++++++++++++
+ arch/arm/dts/rk322x-dram-default-timing.dtsi  |   4 +-
+ arch/arm/dts/rk322x-u-boot.dtsi               |   4 +
+ arch/arm/dts/rk322x.dtsi                      |  27 +++
+ .../rk322x-linux-miniloader-a95xr1_defconfig  | 120 ++++++++++++
+ ...rk322x-linux-miniloader-emmc-dmc_defconfig | 120 ++++++++++++
+ .../rk322x-linux-miniloader-emmc_defconfig    | 118 ++++++++++++
+ ...k322x-linux-miniloader-mkv809vii_defconfig | 120 ++++++++++++
+ .../rk322x-linux-miniloader-mxq4k_defconfig   | 120 ++++++++++++
+ ...rk322x-linux-miniloader-nand-dmc_defconfig | 118 ++++++++++++
+ .../rk322x-linux-miniloader-nand_defconfig    | 116 ++++++++++++
+ include/configs/rk322x_common.h               |   4 +
+ include/configs/rockchip-common.h             |   2 +-
+ 20 files changed, 1291 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm/dts/rk322x-box-a95xr1.dts
+ create mode 100644 arch/arm/dts/rk322x-box-emmc-dmc.dts
+ create mode 100644 arch/arm/dts/rk322x-box-emmc.dts
+ create mode 100644 arch/arm/dts/rk322x-box-mkv809vii.dts
+ create mode 100644 arch/arm/dts/rk322x-box-mxq4k.dts
+ create mode 100644 arch/arm/dts/rk322x-box-nand-dmc.dts
+ create mode 100644 arch/arm/dts/rk322x-box-nand.dts
+ create mode 100644 arch/arm/dts/rk322x-box.dtsi
+ create mode 100644 configs/rk322x-linux-miniloader-a95xr1_defconfig
+ create mode 100644 configs/rk322x-linux-miniloader-emmc-dmc_defconfig
+ create mode 100644 configs/rk322x-linux-miniloader-emmc_defconfig
+ create mode 100644 configs/rk322x-linux-miniloader-mkv809vii_defconfig
+ create mode 100644 configs/rk322x-linux-miniloader-mxq4k_defconfig
+ create mode 100644 configs/rk322x-linux-miniloader-nand-dmc_defconfig
+ create mode 100644 configs/rk322x-linux-miniloader-nand_defconfig
+
+diff --git a/arch/arm/dts/rk322x-box-a95xr1.dts b/arch/arm/dts/rk322x-box-a95xr1.dts
+new file mode 100644
+index 0000000000..3c162c0722
+--- /dev/null
++++ b/arch/arm/dts/rk322x-box-a95xr1.dts
+@@ -0,0 +1,44 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd.
++ *
++ * SPDX-License-Identifier:     GPL-2.0+ X11
++ */
++
++/dts-v1/;
++
++#include "rk322x-box.dtsi"
++#include "rk322x-u-boot.dtsi"
++#include "rk322x-dram-default-timing.dtsi"
++
++/ {
++	model = "Rockchip RK3229 A95XR1";
++
++	aliases {
++		mmc1 = &emmc;
++	};
++
++	chosen {
++		u-boot,spl-boot-order = &sdmmc, &emmc;
++	};
++
++};
++
++&dmc {
++	ddr_timing = <&dram_timing>;
++	dram_frequency = <786000000>;
++};
++
++&dram_timing {
++	sr_idle = <0>;
++	pd_idle = <0>;
++	ddr3_drv = <DDR3_DS_34ohm>;
++	ddr3_odt = <DDR3_ODT_120ohm>;
++	phy_ddr3_clk_drv = <PHY_DDR3_RON_RTT_34ohm>;
++	phy_ddr3_cmd_drv = <PHY_DDR3_RON_RTT_34ohm>;
++	phy_ddr3_odt = <PHY_DDR3_RON_RTT_225ohm>;
++
++};
++
++&emmc {
++	status = "okay";
++};
+diff --git a/arch/arm/dts/rk322x-box-emmc-dmc.dts b/arch/arm/dts/rk322x-box-emmc-dmc.dts
+new file mode 100644
+index 0000000000..c9a10f19a3
+--- /dev/null
++++ b/arch/arm/dts/rk322x-box-emmc-dmc.dts
+@@ -0,0 +1,33 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd.
++ *
++ * SPDX-License-Identifier:     GPL-2.0+ X11
++ */
++
++/dts-v1/;
++
++#include "rk322x-box.dtsi"
++#include "rk322x-u-boot.dtsi"
++#include "rk322x-dram-default-timing.dtsi"
++
++/ {
++	model = "Rockchip RK322x SoC (eMMC)";
++
++	aliases {
++		mmc1 = &emmc;
++	};
++
++	chosen {
++		u-boot,spl-boot-order = &sdmmc, &emmc;
++	};
++
++};
++
++&dmc {
++	ddr_timing = <&dram_timing>;
++	dram_frequency = <786000000>;
++};
++
++&emmc {
++	status = "okay";
++};
+diff --git a/arch/arm/dts/rk322x-box-emmc.dts b/arch/arm/dts/rk322x-box-emmc.dts
+new file mode 100644
+index 0000000000..451df3e5c3
+--- /dev/null
++++ b/arch/arm/dts/rk322x-box-emmc.dts
+@@ -0,0 +1,28 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd.
++ *
++ * SPDX-License-Identifier:     GPL-2.0+ X11
++ */
++
++/dts-v1/;
++
++#include "rk322x-box.dtsi"
++#include "rk322x-u-boot.dtsi"
++#include <dt-bindings/input/input.h>
++
++/ {
++	model = "Rockchip RK322x SoC (eMMC)";
++
++	aliases {
++		mmc1 = &emmc;
++	};
++
++	chosen {
++		u-boot,spl-boot-order = &sdmmc, &emmc;
++	};
++
++};
++
++&emmc {
++	status = "okay";
++};
+diff --git a/arch/arm/dts/rk322x-box-mkv809vii.dts b/arch/arm/dts/rk322x-box-mkv809vii.dts
+new file mode 100644
+index 0000000000..b3d0bd9fe3
+--- /dev/null
++++ b/arch/arm/dts/rk322x-box-mkv809vii.dts
+@@ -0,0 +1,37 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd.
++ *
++ * SPDX-License-Identifier:     GPL-2.0+ X11
++ */
++
++/dts-v1/;
++
++#include "rk322x-box.dtsi"
++#include "rk322x-u-boot.dtsi"
++#include "rk322x-dram-default-timing.dtsi"
++
++/ {
++	model = "Rockchip RK322x MK809IV";
++
++	aliases {
++		mmc1 = &emmc;
++	};
++
++	chosen {
++		u-boot,spl-boot-order = &sdmmc, &emmc;
++	};
++
++};
++
++&dmc {
++	ddr_timing = <&dram_timing>;
++	dram_frequency = <456000000>;
++};
++
++&dram_timing {
++	sr_idle = <12>;
++};
++
++&emmc {
++	status = "okay";
++};
+diff --git a/arch/arm/dts/rk322x-box-mxq4k.dts b/arch/arm/dts/rk322x-box-mxq4k.dts
+new file mode 100644
+index 0000000000..c78cbbc601
+--- /dev/null
++++ b/arch/arm/dts/rk322x-box-mxq4k.dts
+@@ -0,0 +1,43 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd.
++ *
++ * SPDX-License-Identifier:     GPL-2.0+ X11
++ */
++
++/dts-v1/;
++
++#include "rk322x-box.dtsi"
++#include "rk322x-u-boot.dtsi"
++#include "rk322x-dram-default-timing.dtsi"
++
++/ {
++	model = "Rockchip RK322x MK809IV";
++
++	aliases {
++		mmc1 = &emmc;
++	};
++
++	chosen {
++		u-boot,spl-boot-order = &sdmmc, &emmc;
++	};
++
++};
++
++&dmc {
++	ddr_timing = <&dram_timing>;
++	dram_frequency = <700000000>;
++};
++
++&dram_timing {
++	dram_dll_disb_freq = <200>;
++	phy_dll_disb_freq = <200>;
++	dram_odt_disb_freq = <133>;
++	phy_odt_disb_freq = <133>;
++	ddr3_drv = <DDR3_DS_34ohm>;
++	phy_ddr3_clk_drv = <PHY_DDR3_RON_RTT_34ohm>;
++	phy_ddr3_cmd_drv = <PHY_DDR3_RON_RTT_34ohm>;	
++};
++
++&emmc {
++	status = "okay";
++};
+diff --git a/arch/arm/dts/rk322x-box-nand-dmc.dts b/arch/arm/dts/rk322x-box-nand-dmc.dts
+new file mode 100644
+index 0000000000..411946a036
+--- /dev/null
++++ b/arch/arm/dts/rk322x-box-nand-dmc.dts
+@@ -0,0 +1,32 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd.
++ *
++ * SPDX-License-Identifier:     GPL-2.0+ X11
++ */
++
++/dts-v1/;
++
++#include "rk322x-box.dtsi"
++#include "rk322x-u-boot.dtsi"
++#include "rk322x-dram-default-timing.dtsi"
++
++/ {
++	model = "Rockchip RK322x SoC (NAND)";
++
++	aliases {
++		mmc1 = &nandc;
++	};
++
++	chosen {
++		u-boot,spl-boot-order = &sdmmc, &nandc;
++	};
++};
++
++&dmc {
++	ddr_timing = <&dram_timing>;
++	dram_frequency = <786000000>;
++};
++
++&nandc {
++	status = "okay";
++};
+diff --git a/arch/arm/dts/rk322x-box-nand.dts b/arch/arm/dts/rk322x-box-nand.dts
+new file mode 100644
+index 0000000000..3400713538
+--- /dev/null
++++ b/arch/arm/dts/rk322x-box-nand.dts
+@@ -0,0 +1,27 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd.
++ *
++ * SPDX-License-Identifier:     GPL-2.0+ X11
++ */
++
++/dts-v1/;
++
++#include "rk322x-box.dtsi"
++#include "rk322x-u-boot.dtsi"
++#include <dt-bindings/input/input.h>
++
++/ {
++	model = "Rockchip RK322x SoC (NAND)";
++
++	aliases {
++		mmc1 = &nandc;
++	};
++
++	chosen {
++		u-boot,spl-boot-order = &sdmmc, &nandc;
++	};
++};
++
++&nandc {
++	status = "okay";
++};
+diff --git a/arch/arm/dts/rk322x-box.dtsi b/arch/arm/dts/rk322x-box.dtsi
+new file mode 100644
+index 0000000000..974d10b239
+--- /dev/null
++++ b/arch/arm/dts/rk322x-box.dtsi
+@@ -0,0 +1,177 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd.
++ *
++ * SPDX-License-Identifier:     GPL-2.0+ X11
++ */
++
++/dts-v1/;
++
++#include "rk322x.dtsi"
++#include "rk322x-u-boot.dtsi"
++#include <dt-bindings/input/input.h>
++
++/ {
++	model = "Rockchip RK322x SoC";
++	compatible = "rockchip,rk3229-evb", "rockchip,rk3229";
++
++	aliases {
++               serial0 = &uart0;
++               serial1 = &uart1;
++               serial2 = &uart2;
++               mmc0 = &sdmmc;
++        };
++
++	ext_gmac: ext_gmac {
++		compatible = "fixed-clock";
++		clock-frequency = <125000000>;
++		clock-output-names = "ext_gmac";
++		#clock-cells = <0>;
++	};
++
++	gpio-leds {
++                compatible = "gpio-leds";
++
++		 red {
++                        label = "rk322xbox:red:power";
++                        gpios = <&gpio1 RK_PA7 GPIO_ACTIVE_HIGH>;
++                        default-state = "on";
++                };
++
++        };
++
++	vcc_phy: vcc-phy-regulator {
++		compatible = "regulator-fixed";
++		enable-active-high;
++		regulator-name = "vcc_phy";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	vcc_otg_vbus: otg-vbus-regulator {
++		compatible = "regulator-fixed";
++		gpio = <&gpio3 RK_PC6 GPIO_ACTIVE_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&otg_vbus_drv>;
++		regulator-name = "vcc_otg_vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		enable-active-high;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	vcc_host: vcc-host-regulator {
++		compatible = "regulator-fixed";
++		gpio = <&gpio3 RK_PC4 GPIO_ACTIVE_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&host_vbus_drv>;
++		regulator-name = "vcc_host";
++		enable-active-high;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	gpio-keys {
++		u-boot,dm-pre-reloc;
++		compatible = "gpio-keys";
++		status = "okay";
++
++		volume-up {
++			u-boot,dm-pre-reloc;
++			linux,code = <KEY_VOLUMEUP>;
++			label = "Volume Up";
++			gpios = <&gpio3 25 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++};
++
++&dmc {
++	rockchip,pctl-timing = <0x96 0xC8 0x1F3 0xF 0x8000004D 0x4 0x4E 0x6 0x3
++		0x0 0x6 0x5 0xC 0x10 0x6 0x4 0x4
++		0x5 0x4 0x200 0x3 0xA 0x40 0x0 0x1
++		0x5 0x5 0x3 0xC 0x1E 0x100 0x0 0x4
++		0x0 0x924>;
++	rockchip,phy-timing = <0x220 0x1 0x0 0x0 0x0 0x4 0x60>;
++	rockchip,sdram-params = <0x428B188 0x0 0x21 0x472 0x15
++		0 300 3 0 120>;
++};
++
++&gmac {
++	assigned-clocks = <&cru SCLK_MAC_EXTCLK>, <&cru SCLK_MAC>;
++	assigned-clock-parents = <&ext_gmac>, <&cru SCLK_MAC_EXTCLK>;
++	clock_in_out = "input";
++	phy-supply = <&vcc_phy>;
++	phy-mode = "rgmii";
++	pinctrl-names = "default";
++	pinctrl-0 = <&rgmii_pins>;
++	snps,reset-gpio = <&gpio2 RK_PD0 GPIO_ACTIVE_LOW>;
++	snps,reset-active-low;
++	snps,reset-delays-us = <0 10000 1000000>;
++	tx_delay = <0x30>;
++	rx_delay = <0x10>;
++	status = "okay";
++};
++
++&sdmmc {
++	bus-width = <4>;
++	cap-mmc-highspeed;
++	cap-sd-highspeed;
++	card-detect-delay = <200>;
++	disable-wp;
++	num-slots = <1>;
++	supports-sd;
++	status = "okay";
++};
++
++&uart2 {
++	status = "okay";
++};
++
++&u2phy0 {
++	status = "okay";
++
++	u2phy0_otg: otg-port {
++		status = "okay";
++	};
++
++	u2phy0_host: host-port {
++		status = "okay";
++	};
++};
++
++&u2phy1 {
++	status = "okay";
++
++	u2phy1_otg: otg-port {
++		status = "okay";
++	};
++
++	u2phy1_host: host-port {
++		status = "okay";
++	};
++};
++
++&usb_host0_ehci {
++	status = "okay";
++};
++
++&usb20_otg {
++	status = "okay";
++};
++
++&pinctrl {
++
++	usb {
++		otg_vbus_drv: otg-vbus-drv {
++			rockchip,pins = <3 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++
++		host_vbus_drv: host-vbus-drv {
++			rockchip,pins = <3 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++};
+diff --git a/arch/arm/dts/rk322x-dram-default-timing.dtsi b/arch/arm/dts/rk322x-dram-default-timing.dtsi
+index 15b94ece99..92bf92f6c0 100644
+--- a/arch/arm/dts/rk322x-dram-default-timing.dtsi
++++ b/arch/arm/dts/rk322x-dram-default-timing.dtsi
+@@ -10,8 +10,8 @@
+ 	dram_timing: dram_timing {
+ 		compatible = "rockchip,dram-timing";
+ 		dram_spd_bin = <21>; /* DDR3_DEFAULT */
+-		sr_idle = <0x18>;
+-		pd_idle = <0x20>;
++		sr_idle = <24>;
++		pd_idle = <32>;
+ 		dram_dll_disb_freq = <300>;
+ 		phy_dll_disb_freq = <400>;
+ 		dram_odt_disb_freq = <333>;
+diff --git a/arch/arm/dts/rk322x-u-boot.dtsi b/arch/arm/dts/rk322x-u-boot.dtsi
+index acb5f506b9..89612231fa 100644
+--- a/arch/arm/dts/rk322x-u-boot.dtsi
++++ b/arch/arm/dts/rk322x-u-boot.dtsi
+@@ -27,6 +27,10 @@
+ 	u-boot,dm-pre-reloc;
+ };
+ 
++&efuse {
++	u-boot,dm-pre-reloc;
++};
++
+ &grf {
+ 	u-boot,dm-pre-reloc;
+ };
+diff --git a/arch/arm/dts/rk322x.dtsi b/arch/arm/dts/rk322x.dtsi
+index f3cb5ad07f..6714644b8e 100644
+--- a/arch/arm/dts/rk322x.dtsi
++++ b/arch/arm/dts/rk322x.dtsi
+@@ -517,6 +517,33 @@
+ 		status = "disabled";
+ 	};
+ 
++	usb_host0_ehci: usb@30080000 {
++		compatible = "generic-ehci";
++		reg = <0x30080000 0x20000>;
++		interrupts = <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>;
++		phys = <&u2phy0_host>;
++		phy-names = "usb";
++		status = "disabled";
++	};
++
++	usb_host1_ehci: usb@300c0000 {
++		compatible = "generic-ehci";
++		reg = <0x300c0000 0x20000>;
++		interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
++		phys = <&u2phy1_host>;
++		phy-names = "usb";
++		status = "disabled";
++	};
++
++	usb_host2_ehci: usb@30100000 {
++		compatible = "generic-ehci";
++		reg = <0x30100000 0x20000>;
++		interrupts = <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>;
++		phys = <&u2phy1_otg>;
++		phy-names = "usb";
++		status = "disabled";
++	};
++
+ 	gmac: ethernet@30200000 {
+ 		compatible = "rockchip,rk3228-gmac";
+ 		reg = <0x30200000 0x10000>;
+diff --git a/configs/rk322x-linux-miniloader-a95xr1_defconfig b/configs/rk322x-linux-miniloader-a95xr1_defconfig
+new file mode 100644
+index 0000000000..0cfd596206
+--- /dev/null
++++ b/configs/rk322x-linux-miniloader-a95xr1_defconfig
+@@ -0,0 +1,120 @@
++CONFIG_ARM=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_SYS_MALLOC_F_LEN=0x1000
++CONFIG_ROCKCHIP_RK322X=y
++CONFIG_TPL_LDSCRIPT="arch/arm/mach-rockchip/u-boot-tpl.lds"
++CONFIG_TPL_TEXT_BASE=0x10081000
++CONFIG_TPL_MAX_SIZE=28672
++CONFIG_TPL_STACK=0x10088000
++CONFIG_TPL_ROCKCHIP_BACK_TO_BROM=y
++CONFIG_TPL_TINY_MEMSET=y
++CONFIG_USE_TINY_PRINTF=y
++CONFIG_ROCKCHIP_SPL_RESERVE_IRAM=0x0
++CONFIG_TARGET_BOX_RK322X=y
++CONFIG_SPL_STACK_R_ADDR=0x60600000
++CONFIG_DEFAULT_DEVICE_TREE="rk322x-box-a95xr1"
++CONFIG_BOOTDELAY=1
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_SPL_LOAD_FIT=y
++CONFIG_SPL_FIT_GENERATOR="arch/arm/mach-rockchip/make_fit_optee.sh"
++# CONFIG_DISPLAY_CPUINFO is not set
++# CONFIG_ANDROID_BOOTLOADER is not set
++# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
++# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
++CONFIG_SPL_STACK_R=y
++CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN=0x2000
++CONFIG_SPL_OPTEE=y
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_GPT is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_NET=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_TIME=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_TPL_OF_CONTROL=y
++CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++# CONFIG_ENV_IS_IN_MMC is not set
++CONFIG_TPL_DM=y
++CONFIG_REGMAP=y
++CONFIG_SPL_REGMAP=y
++CONFIG_TPL_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_SPL_SYSCON=y
++CONFIG_TPL_SYSCON=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_TPL_CLK=y
++CONFIG_ROCKCHIP_GPIO=y
++CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_MISC=y
++CONFIG_ROCKCHIP_EFUSE=y
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_DM_ETH=y
++CONFIG_ETH_DESIGNWARE=y
++CONFIG_GMAC_ROCKCHIP=y
++CONFIG_PHY=y
++CONFIG_PHY_ROCKCHIP_INNO_USB2=y
++CONFIG_PINCTRL=y
++CONFIG_RAM=y
++CONFIG_SPL_RAM=y
++CONFIG_TPL_RAM=y
++CONFIG_BAUDRATE=1500000
++CONFIG_DEBUG_UART_BASE=0x11030000
++CONFIG_DEBUG_UART_CLOCK=24000000
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SYS_NS16550=y
++CONFIG_SYSRESET=y
++CONFIG_USB=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DWC2_OTG=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_G_DNL_MANUFACTURER="Rockchip"
++CONFIG_G_DNL_VENDOR_NUM=0x18d1
++CONFIG_G_DNL_PRODUCT_NUM=0xd00d
++CONFIG_SHA1=y
++CONFIG_SHA256=y
++CONFIG_ERRNO_STR=y
++CONFIG_OPTEE_CLIENT=y
++CONFIG_OPTEE_V1=y
++CONFIG_DM_RESET=y
++CONFIG_RESET_ROCKCHIP=y
++CONFIG_ROCKCHIP_SFC=y
++CONFIG_RKNAND=y
++CONFIG_LZ4=y
++CONFIG_LZO=y
++CONFIG_LZMA=y
++CONFIG_DM_KEY=y
++CONFIG_USB_STORAGE=y
++CONFIG_ROCKCHIP_USB_BOOT=y
++CONFIG_INPUT=y
++CONFIG_ADC_KEY=y
++CONFIG_GPIO_KEY=y
++CONFIG_RK_KEY=y
++CONFIG_PWRKEY_DNL_TRIGGER_NUM=1
++CONFIG_REGULATOR_PWM=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_PWM_ROCKCHIP=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_OHCI_GENERIC=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_OHCI_NEW=y
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++CONFIG_CMD_LED=y
++CONFIG_ROCKCHIP_DMC=y
++CONFIG_OF_LIVE=y
++# CONFIG_RKIMG_BOOTLOADER is not set
++# CONFIG_USING_KERNEL_DTB is not set
++# CONFIG_ROCKCHIP_RESOURCE_IMAGE is not set
++# CONFIG_EFI_LOADER is not set
++# CONFIG_EFI_PARTITION is not set
+diff --git a/configs/rk322x-linux-miniloader-emmc-dmc_defconfig b/configs/rk322x-linux-miniloader-emmc-dmc_defconfig
+new file mode 100644
+index 0000000000..c8d904e697
+--- /dev/null
++++ b/configs/rk322x-linux-miniloader-emmc-dmc_defconfig
+@@ -0,0 +1,120 @@
++CONFIG_ARM=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_SYS_MALLOC_F_LEN=0x1000
++CONFIG_ROCKCHIP_RK322X=y
++CONFIG_TPL_LDSCRIPT="arch/arm/mach-rockchip/u-boot-tpl.lds"
++CONFIG_TPL_TEXT_BASE=0x10081000
++CONFIG_TPL_MAX_SIZE=28672
++CONFIG_TPL_STACK=0x10088000
++CONFIG_TPL_ROCKCHIP_BACK_TO_BROM=y
++CONFIG_TPL_TINY_MEMSET=y
++CONFIG_USE_TINY_PRINTF=y
++CONFIG_ROCKCHIP_SPL_RESERVE_IRAM=0x0
++CONFIG_TARGET_BOX_RK322X=y
++CONFIG_SPL_STACK_R_ADDR=0x60600000
++CONFIG_DEFAULT_DEVICE_TREE="rk322x-box-emmc-dmc"
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_SPL_LOAD_FIT=y
++CONFIG_SPL_FIT_GENERATOR="arch/arm/mach-rockchip/make_fit_optee.sh"
++# CONFIG_DISPLAY_CPUINFO is not set
++# CONFIG_ANDROID_BOOTLOADER is not set
++# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
++# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
++CONFIG_SPL_STACK_R=y
++CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN=0x2000
++CONFIG_SPL_OPTEE=y
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_GPT is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_NET=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_TIME=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_TPL_OF_CONTROL=y
++CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++# CONFIG_ENV_IS_IN_MMC is not set
++CONFIG_TPL_DM=y
++CONFIG_REGMAP=y
++CONFIG_SPL_REGMAP=y
++CONFIG_TPL_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_SPL_SYSCON=y
++CONFIG_TPL_SYSCON=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_TPL_CLK=y
++CONFIG_ROCKCHIP_GPIO=y
++CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_MISC=y
++CONFIG_ROCKCHIP_EFUSE=y
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_DM_ETH=y
++CONFIG_ETH_DESIGNWARE=y
++CONFIG_GMAC_ROCKCHIP=y
++CONFIG_PHY=y
++CONFIG_PHY_ROCKCHIP_INNO_USB2=y
++CONFIG_PINCTRL=y
++CONFIG_RAM=y
++CONFIG_SPL_RAM=y
++CONFIG_TPL_RAM=y
++CONFIG_BAUDRATE=1500000
++CONFIG_DEBUG_UART_BASE=0x11030000
++CONFIG_DEBUG_UART_CLOCK=24000000
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SYS_NS16550=y
++CONFIG_SYSRESET=y
++CONFIG_USB=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DWC2_OTG=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_G_DNL_MANUFACTURER="Rockchip"
++CONFIG_G_DNL_VENDOR_NUM=0x18d1
++CONFIG_G_DNL_PRODUCT_NUM=0xd00d
++CONFIG_SHA1=y
++CONFIG_SHA256=y
++CONFIG_ERRNO_STR=y
++CONFIG_OPTEE_CLIENT=y
++CONFIG_OPTEE_V1=y
++CONFIG_DM_RESET=y
++CONFIG_RESET_ROCKCHIP=y
++CONFIG_ROCKCHIP_SFC=y
++CONFIG_RKNAND=y
++CONFIG_LZ4=y
++CONFIG_LZO=y
++CONFIG_LZMA=y
++CONFIG_USB_STORAGE=y
++CONFIG_ROCKCHIP_USB_BOOT=y
++CONFIG_INPUT=y
++CONFIG_DM_KEY=y
++CONFIG_ADC_KEY=y
++CONFIG_GPIO_KEY=y
++CONFIG_RK_KEY=y
++CONFIG_PWRKEY_DNL_TRIGGER_NUM=1
++CONFIG_BOOTDELAY=1
++CONFIG_REGULATOR_PWM=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_PWM_ROCKCHIP=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_OHCI_GENERIC=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_OHCI_NEW=y
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++CONFIG_CMD_LED=y
++CONFIG_ROCKCHIP_DMC=y
++CONFIG_OF_LIVE=y
++# CONFIG_RKIMG_BOOTLOADER is not set
++# CONFIG_USING_KERNEL_DTB is not set
++# CONFIG_ROCKCHIP_RESOURCE_IMAGE is not set
++# CONFIG_EFI_PARTITION is not set
++# CONFIG_EFI_LOADER is not set
+diff --git a/configs/rk322x-linux-miniloader-emmc_defconfig b/configs/rk322x-linux-miniloader-emmc_defconfig
+new file mode 100644
+index 0000000000..ef8a67b21b
+--- /dev/null
++++ b/configs/rk322x-linux-miniloader-emmc_defconfig
+@@ -0,0 +1,118 @@
++CONFIG_ARM=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_SYS_MALLOC_F_LEN=0x1000
++CONFIG_ROCKCHIP_RK322X=y
++CONFIG_TPL_LDSCRIPT="arch/arm/mach-rockchip/u-boot-tpl.lds"
++CONFIG_TPL_TEXT_BASE=0x10081000
++CONFIG_TPL_MAX_SIZE=28672
++CONFIG_TPL_STACK=0x10088000
++CONFIG_TPL_ROCKCHIP_BACK_TO_BROM=y
++CONFIG_TPL_TINY_MEMSET=y
++CONFIG_USE_TINY_PRINTF=y
++CONFIG_ROCKCHIP_SPL_RESERVE_IRAM=0x0
++CONFIG_TARGET_BOX_RK322X=y
++CONFIG_SPL_STACK_R_ADDR=0x60600000
++CONFIG_DEFAULT_DEVICE_TREE="rk322x-box-emmc"
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_SPL_LOAD_FIT=y
++CONFIG_SPL_FIT_GENERATOR="arch/arm/mach-rockchip/make_fit_optee.sh"
++# CONFIG_DISPLAY_CPUINFO is not set
++# CONFIG_ANDROID_BOOTLOADER is not set
++# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
++# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
++CONFIG_SPL_STACK_R=y
++CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN=0x2000
++CONFIG_SPL_OPTEE=y
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_GPT is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_NET=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_TIME=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_TPL_OF_CONTROL=y
++CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++# CONFIG_ENV_IS_IN_MMC is not set
++CONFIG_TPL_DM=y
++CONFIG_REGMAP=y
++CONFIG_SPL_REGMAP=y
++CONFIG_TPL_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_SPL_SYSCON=y
++CONFIG_TPL_SYSCON=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_TPL_CLK=y
++CONFIG_ROCKCHIP_GPIO=y
++CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_MISC=y
++CONFIG_ROCKCHIP_EFUSE=y
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_DM_ETH=y
++CONFIG_ETH_DESIGNWARE=y
++CONFIG_GMAC_ROCKCHIP=y
++CONFIG_PHY=y
++CONFIG_PHY_ROCKCHIP_INNO_USB2=y
++CONFIG_PINCTRL=y
++CONFIG_RAM=y
++CONFIG_SPL_RAM=y
++CONFIG_TPL_RAM=y
++CONFIG_BAUDRATE=1500000
++CONFIG_DEBUG_UART_BASE=0x11030000
++CONFIG_DEBUG_UART_CLOCK=24000000
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SYS_NS16550=y
++CONFIG_SYSRESET=y
++CONFIG_USB=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DWC2_OTG=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_G_DNL_MANUFACTURER="Rockchip"
++CONFIG_G_DNL_VENDOR_NUM=0x18d1
++CONFIG_G_DNL_PRODUCT_NUM=0xd00d
++CONFIG_SHA1=y
++CONFIG_SHA256=y
++CONFIG_ERRNO_STR=y
++CONFIG_OPTEE_CLIENT=y
++CONFIG_OPTEE_V1=y
++CONFIG_DM_RESET=y
++CONFIG_RESET_ROCKCHIP=y
++CONFIG_ROCKCHIP_SFC=y
++CONFIG_RKNAND=y
++CONFIG_LZ4=y
++CONFIG_LZO=y
++CONFIG_LZMA=y
++CONFIG_USB_STORAGE=y
++CONFIG_ROCKCHIP_USB_BOOT=y
++CONFIG_INPUT=y
++CONFIG_DM_KEY=y
++CONFIG_ADC_KEY=y
++CONFIG_GPIO_KEY=y
++CONFIG_RK_KEY=y
++CONFIG_PWRKEY_DNL_TRIGGER_NUM=1
++CONFIG_BOOTDELAY=1
++CONFIG_REGULATOR_PWM=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_PWM_ROCKCHIP=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_OHCI_GENERIC=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_OHCI_NEW=y
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++CONFIG_CMD_LED=y
++# CONFIG_RKIMG_BOOTLOADER is not set
++# CONFIG_USING_KERNEL_DTB is not set
++# CONFIG_ROCKCHIP_RESOURCE_IMAGE is not set
++# CONFIG_EFI_PARTITION is not set
++# CONFIG_EFI_LOADER is not set
+diff --git a/configs/rk322x-linux-miniloader-mkv809vii_defconfig b/configs/rk322x-linux-miniloader-mkv809vii_defconfig
+new file mode 100644
+index 0000000000..e4650a1c05
+--- /dev/null
++++ b/configs/rk322x-linux-miniloader-mkv809vii_defconfig
+@@ -0,0 +1,120 @@
++CONFIG_ARM=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_SYS_MALLOC_F_LEN=0x1000
++CONFIG_ROCKCHIP_RK322X=y
++CONFIG_TPL_LDSCRIPT="arch/arm/mach-rockchip/u-boot-tpl.lds"
++CONFIG_TPL_TEXT_BASE=0x10081000
++CONFIG_TPL_MAX_SIZE=28672
++CONFIG_TPL_STACK=0x10088000
++CONFIG_TPL_ROCKCHIP_BACK_TO_BROM=y
++CONFIG_TPL_TINY_MEMSET=y
++CONFIG_USE_TINY_PRINTF=y
++CONFIG_ROCKCHIP_SPL_RESERVE_IRAM=0x0
++CONFIG_TARGET_BOX_RK322X=y
++CONFIG_SPL_STACK_R_ADDR=0x60600000
++CONFIG_DEFAULT_DEVICE_TREE="rk322x-box-mkv809vii"
++CONFIG_BOOTDELAY=1
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_SPL_LOAD_FIT=y
++CONFIG_SPL_FIT_GENERATOR="arch/arm/mach-rockchip/make_fit_optee.sh"
++# CONFIG_DISPLAY_CPUINFO is not set
++# CONFIG_ANDROID_BOOTLOADER is not set
++# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
++# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
++CONFIG_SPL_STACK_R=y
++CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN=0x2000
++CONFIG_SPL_OPTEE=y
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_GPT is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_NET=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_TIME=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_TPL_OF_CONTROL=y
++CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++# CONFIG_ENV_IS_IN_MMC is not set
++CONFIG_TPL_DM=y
++CONFIG_REGMAP=y
++CONFIG_SPL_REGMAP=y
++CONFIG_TPL_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_SPL_SYSCON=y
++CONFIG_TPL_SYSCON=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_TPL_CLK=y
++CONFIG_ROCKCHIP_GPIO=y
++CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_MISC=y
++CONFIG_ROCKCHIP_EFUSE=y
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_DM_ETH=y
++CONFIG_ETH_DESIGNWARE=y
++CONFIG_GMAC_ROCKCHIP=y
++CONFIG_PHY=y
++CONFIG_PHY_ROCKCHIP_INNO_USB2=y
++CONFIG_PINCTRL=y
++CONFIG_RAM=y
++CONFIG_SPL_RAM=y
++CONFIG_TPL_RAM=y
++CONFIG_BAUDRATE=1500000
++CONFIG_DEBUG_UART_BASE=0x11030000
++CONFIG_DEBUG_UART_CLOCK=24000000
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SYS_NS16550=y
++CONFIG_SYSRESET=y
++CONFIG_USB=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DWC2_OTG=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_G_DNL_MANUFACTURER="Rockchip"
++CONFIG_G_DNL_VENDOR_NUM=0x18d1
++CONFIG_G_DNL_PRODUCT_NUM=0xd00d
++CONFIG_SHA1=y
++CONFIG_SHA256=y
++CONFIG_ERRNO_STR=y
++CONFIG_OPTEE_CLIENT=y
++CONFIG_OPTEE_V1=y
++CONFIG_DM_RESET=y
++CONFIG_RESET_ROCKCHIP=y
++CONFIG_ROCKCHIP_SFC=y
++CONFIG_RKNAND=y
++CONFIG_LZ4=y
++CONFIG_LZO=y
++CONFIG_LZMA=y
++CONFIG_DM_KEY=y
++CONFIG_USB_STORAGE=y
++CONFIG_ROCKCHIP_USB_BOOT=y
++CONFIG_INPUT=y
++CONFIG_ADC_KEY=y
++CONFIG_GPIO_KEY=y
++CONFIG_RK_KEY=y
++CONFIG_PWRKEY_DNL_TRIGGER_NUM=1
++CONFIG_REGULATOR_PWM=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_PWM_ROCKCHIP=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_OHCI_GENERIC=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_OHCI_NEW=y
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++CONFIG_CMD_LED=y
++CONFIG_ROCKCHIP_DMC=y
++CONFIG_OF_LIVE=y
++# CONFIG_RKIMG_BOOTLOADER is not set
++# CONFIG_USING_KERNEL_DTB is not set
++# CONFIG_ROCKCHIP_RESOURCE_IMAGE is not set
++# CONFIG_EFI_PARTITION is not set
++# CONFIG_EFI_LOADER is not set
+diff --git a/configs/rk322x-linux-miniloader-mxq4k_defconfig b/configs/rk322x-linux-miniloader-mxq4k_defconfig
+new file mode 100644
+index 0000000000..fd1019676d
+--- /dev/null
++++ b/configs/rk322x-linux-miniloader-mxq4k_defconfig
+@@ -0,0 +1,120 @@
++CONFIG_ARM=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_SYS_MALLOC_F_LEN=0x1000
++CONFIG_ROCKCHIP_RK322X=y
++CONFIG_TPL_LDSCRIPT="arch/arm/mach-rockchip/u-boot-tpl.lds"
++CONFIG_TPL_TEXT_BASE=0x10081000
++CONFIG_TPL_MAX_SIZE=28672
++CONFIG_TPL_STACK=0x10088000
++CONFIG_TPL_ROCKCHIP_BACK_TO_BROM=y
++CONFIG_TPL_TINY_MEMSET=y
++CONFIG_USE_TINY_PRINTF=y
++CONFIG_ROCKCHIP_SPL_RESERVE_IRAM=0x0
++CONFIG_TARGET_BOX_RK322X=y
++CONFIG_SPL_STACK_R_ADDR=0x60600000
++CONFIG_DEFAULT_DEVICE_TREE="rk322x-box-mxq4k"
++CONFIG_BOOTDELAY=1
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_SPL_LOAD_FIT=y
++CONFIG_SPL_FIT_GENERATOR="arch/arm/mach-rockchip/make_fit_optee.sh"
++# CONFIG_DISPLAY_CPUINFO is not set
++# CONFIG_ANDROID_BOOTLOADER is not set
++# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
++# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
++CONFIG_SPL_STACK_R=y
++CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN=0x2000
++CONFIG_SPL_OPTEE=y
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_GPT is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_NET=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_TIME=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_TPL_OF_CONTROL=y
++CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++# CONFIG_ENV_IS_IN_MMC is not set
++CONFIG_TPL_DM=y
++CONFIG_REGMAP=y
++CONFIG_SPL_REGMAP=y
++CONFIG_TPL_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_SPL_SYSCON=y
++CONFIG_TPL_SYSCON=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_TPL_CLK=y
++CONFIG_ROCKCHIP_GPIO=y
++CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_MISC=y
++CONFIG_ROCKCHIP_EFUSE=y
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_DM_ETH=y
++CONFIG_ETH_DESIGNWARE=y
++CONFIG_GMAC_ROCKCHIP=y
++CONFIG_PHY=y
++CONFIG_PHY_ROCKCHIP_INNO_USB2=y
++CONFIG_PINCTRL=y
++CONFIG_RAM=y
++CONFIG_SPL_RAM=y
++CONFIG_TPL_RAM=y
++CONFIG_BAUDRATE=1500000
++CONFIG_DEBUG_UART_BASE=0x11030000
++CONFIG_DEBUG_UART_CLOCK=24000000
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SYS_NS16550=y
++CONFIG_SYSRESET=y
++CONFIG_USB=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DWC2_OTG=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_G_DNL_MANUFACTURER="Rockchip"
++CONFIG_G_DNL_VENDOR_NUM=0x18d1
++CONFIG_G_DNL_PRODUCT_NUM=0xd00d
++CONFIG_SHA1=y
++CONFIG_SHA256=y
++CONFIG_ERRNO_STR=y
++CONFIG_OPTEE_CLIENT=y
++CONFIG_OPTEE_V1=y
++CONFIG_DM_RESET=y
++CONFIG_RESET_ROCKCHIP=y
++CONFIG_ROCKCHIP_SFC=y
++CONFIG_RKNAND=y
++CONFIG_LZ4=y
++CONFIG_LZO=y
++CONFIG_LZMA=y
++CONFIG_DM_KEY=y
++CONFIG_USB_STORAGE=y
++CONFIG_ROCKCHIP_USB_BOOT=y
++CONFIG_INPUT=y
++CONFIG_ADC_KEY=y
++CONFIG_GPIO_KEY=y
++CONFIG_RK_KEY=y
++CONFIG_PWRKEY_DNL_TRIGGER_NUM=1
++CONFIG_REGULATOR_PWM=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_PWM_ROCKCHIP=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_OHCI_GENERIC=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_OHCI_NEW=y
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++CONFIG_CMD_LED=y
++CONFIG_ROCKCHIP_DMC=y
++CONFIG_OF_LIVE=y
++# CONFIG_RKIMG_BOOTLOADER is not set
++# CONFIG_USING_KERNEL_DTB is not set
++# CONFIG_ROCKCHIP_RESOURCE_IMAGE is not set
++# CONFIG_EFI_PARTITION is not set
++# CONFIG_EFI_LOADER is not set
+diff --git a/configs/rk322x-linux-miniloader-nand-dmc_defconfig b/configs/rk322x-linux-miniloader-nand-dmc_defconfig
+new file mode 100644
+index 0000000000..9b7ae7ac8b
+--- /dev/null
++++ b/configs/rk322x-linux-miniloader-nand-dmc_defconfig
+@@ -0,0 +1,118 @@
++CONFIG_ARM=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_SYS_MALLOC_F_LEN=0x1000
++CONFIG_ROCKCHIP_RK322X=y
++CONFIG_TPL_LDSCRIPT="arch/arm/mach-rockchip/u-boot-tpl.lds"
++CONFIG_TPL_TEXT_BASE=0x10081000
++CONFIG_TPL_MAX_SIZE=28672
++CONFIG_TPL_STACK=0x10088000
++CONFIG_TPL_ROCKCHIP_BACK_TO_BROM=y
++CONFIG_TPL_TINY_MEMSET=y
++CONFIG_USE_TINY_PRINTF=y
++CONFIG_ROCKCHIP_SPL_RESERVE_IRAM=0x0
++CONFIG_TARGET_BOX_RK322X=y
++CONFIG_SPL_STACK_R_ADDR=0x60600000
++CONFIG_DEFAULT_DEVICE_TREE="rk322x-box-nand-dmc"
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_SPL_LOAD_FIT=y
++CONFIG_SPL_FIT_GENERATOR="arch/arm/mach-rockchip/make_fit_optee.sh"
++# CONFIG_DISPLAY_CPUINFO is not set
++# CONFIG_ANDROID_BOOTLOADER is not set
++# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
++# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
++CONFIG_SPL_STACK_R=y
++CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN=0x2000
++CONFIG_SPL_OPTEE=y
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_GPT is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_NET=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_TIME=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_TPL_OF_CONTROL=y
++CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++# CONFIG_ENV_IS_IN_MMC is not set
++CONFIG_TPL_DM=y
++CONFIG_REGMAP=y
++CONFIG_SPL_REGMAP=y
++CONFIG_TPL_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_SPL_SYSCON=y
++CONFIG_TPL_SYSCON=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_TPL_CLK=y
++CONFIG_ROCKCHIP_GPIO=y
++CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_MISC=y
++CONFIG_ROCKCHIP_EFUSE=y
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_DM_ETH=y
++CONFIG_ETH_DESIGNWARE=y
++CONFIG_GMAC_ROCKCHIP=y
++CONFIG_PHY=y
++CONFIG_PHY_ROCKCHIP_INNO_USB2=y
++CONFIG_PINCTRL=y
++CONFIG_RAM=y
++CONFIG_SPL_RAM=y
++CONFIG_TPL_RAM=y
++CONFIG_BAUDRATE=1500000
++CONFIG_DEBUG_UART_BASE=0x11030000
++CONFIG_DEBUG_UART_CLOCK=24000000
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SYS_NS16550=y
++CONFIG_SYSRESET=y
++CONFIG_USB=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DWC2_OTG=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_G_DNL_MANUFACTURER="Rockchip"
++CONFIG_G_DNL_VENDOR_NUM=0x18d1
++CONFIG_G_DNL_PRODUCT_NUM=0xd00d
++CONFIG_SHA1=y
++CONFIG_SHA256=y
++CONFIG_ERRNO_STR=y
++CONFIG_OPTEE_CLIENT=y
++CONFIG_OPTEE_V1=y
++CONFIG_DM_RESET=y
++CONFIG_RESET_ROCKCHIP=y
++CONFIG_ROCKCHIP_SFC=y
++CONFIG_RKNAND=y
++CONFIG_LZ4=y
++CONFIG_LZO=y
++CONFIG_LZMA=y
++CONFIG_RKNAND=y
++CONFIG_USB_STORAGE=y
++CONFIG_ROCKCHIP_USB_BOOT=y
++CONFIG_INPUT=y
++CONFIG_DM_KEY=y
++CONFIG_ADC_KEY=y
++CONFIG_GPIO_KEY=y
++CONFIG_RK_KEY=y
++CONFIG_PWRKEY_DNL_TRIGGER_NUM=1
++CONFIG_BOOTDELAY=1
++CONFIG_REGULATOR_PWM=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_PWM_ROCKCHIP=y
++CONFIG_USB_OHCI_GENERIC=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_OHCI_NEW=y
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++CONFIG_ROCKCHIP_DMC=y
++CONFIG_OF_LIVE=y
++# CONFIG_RKIMG_BOOTLOADER is not set
++# CONFIG_USING_KERNEL_DTB is not set
++# CONFIG_ROCKCHIP_RESOURCE_IMAGE is not set
++# CONFIG_EFI_PARTITION is not set
++# CONFIG_EFI_LOADER is not set
+diff --git a/configs/rk322x-linux-miniloader-nand_defconfig b/configs/rk322x-linux-miniloader-nand_defconfig
+new file mode 100644
+index 0000000000..b44460a487
+--- /dev/null
++++ b/configs/rk322x-linux-miniloader-nand_defconfig
+@@ -0,0 +1,116 @@
++CONFIG_ARM=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_SYS_MALLOC_F_LEN=0x1000
++CONFIG_ROCKCHIP_RK322X=y
++CONFIG_TPL_LDSCRIPT="arch/arm/mach-rockchip/u-boot-tpl.lds"
++CONFIG_TPL_TEXT_BASE=0x10081000
++CONFIG_TPL_MAX_SIZE=28672
++CONFIG_TPL_STACK=0x10088000
++CONFIG_TPL_ROCKCHIP_BACK_TO_BROM=y
++CONFIG_TPL_TINY_MEMSET=y
++CONFIG_USE_TINY_PRINTF=y
++CONFIG_ROCKCHIP_SPL_RESERVE_IRAM=0x0
++CONFIG_TARGET_BOX_RK322X=y
++CONFIG_SPL_STACK_R_ADDR=0x60600000
++CONFIG_DEFAULT_DEVICE_TREE="rk322x-box-nand"
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_SPL_LOAD_FIT=y
++CONFIG_SPL_FIT_GENERATOR="arch/arm/mach-rockchip/make_fit_optee.sh"
++# CONFIG_DISPLAY_CPUINFO is not set
++# CONFIG_ANDROID_BOOTLOADER is not set
++# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
++# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
++CONFIG_SPL_STACK_R=y
++CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN=0x2000
++CONFIG_SPL_OPTEE=y
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_GPT is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_NET=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_TIME=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_TPL_OF_CONTROL=y
++CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++# CONFIG_ENV_IS_IN_MMC is not set
++CONFIG_TPL_DM=y
++CONFIG_REGMAP=y
++CONFIG_SPL_REGMAP=y
++CONFIG_TPL_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_SPL_SYSCON=y
++CONFIG_TPL_SYSCON=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_TPL_CLK=y
++CONFIG_ROCKCHIP_GPIO=y
++CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_MISC=y
++CONFIG_ROCKCHIP_EFUSE=y
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_DM_ETH=y
++CONFIG_ETH_DESIGNWARE=y
++CONFIG_GMAC_ROCKCHIP=y
++CONFIG_PHY=y
++CONFIG_PHY_ROCKCHIP_INNO_USB2=y
++CONFIG_PINCTRL=y
++CONFIG_RAM=y
++CONFIG_SPL_RAM=y
++CONFIG_TPL_RAM=y
++CONFIG_BAUDRATE=1500000
++CONFIG_DEBUG_UART_BASE=0x11030000
++CONFIG_DEBUG_UART_CLOCK=24000000
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SYS_NS16550=y
++CONFIG_SYSRESET=y
++CONFIG_USB=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DWC2_OTG=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_G_DNL_MANUFACTURER="Rockchip"
++CONFIG_G_DNL_VENDOR_NUM=0x18d1
++CONFIG_G_DNL_PRODUCT_NUM=0xd00d
++CONFIG_SHA1=y
++CONFIG_SHA256=y
++CONFIG_ERRNO_STR=y
++CONFIG_OPTEE_CLIENT=y
++CONFIG_OPTEE_V1=y
++CONFIG_DM_RESET=y
++CONFIG_RESET_ROCKCHIP=y
++CONFIG_ROCKCHIP_SFC=y
++CONFIG_RKNAND=y
++CONFIG_LZ4=y
++CONFIG_LZO=y
++CONFIG_LZMA=y
++CONFIG_RKNAND=y
++CONFIG_DM_KEY=y
++CONFIG_USB_STORAGE=y
++CONFIG_ROCKCHIP_USB_BOOT=y
++CONFIG_INPUT=y
++CONFIG_ADC_KEY=y
++CONFIG_GPIO_KEY=y
++CONFIG_RK_KEY=y
++CONFIG_PWRKEY_DNL_TRIGGER_NUM=1
++CONFIG_BOOTDELAY=1
++CONFIG_REGULATOR_PWM=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_PWM_ROCKCHIP=y
++CONFIG_USB_OHCI_GENERIC=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_OHCI_NEW=y
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++# CONFIG_RKIMG_BOOTLOADER is not set
++# CONFIG_USING_KERNEL_DTB is not set
++# CONFIG_ROCKCHIP_RESOURCE_IMAGE is not set
++# CONFIG_EFI_PARTITION is not set
++# CONFIG_EFI_LOADER is not set
+diff --git a/include/configs/rk322x_common.h b/include/configs/rk322x_common.h
+index da4eac28a0..3f3205cb03 100644
+--- a/include/configs/rk322x_common.h
++++ b/include/configs/rk322x_common.h
+@@ -60,4 +60,8 @@
+ 
+ #define CONFIG_PREBOOT
+ 
++/* rockchip ohci host driver */
++#define CONFIG_USB_OHCI_NEW
++#define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS      1
++
+ #endif
+diff --git a/include/configs/rockchip-common.h b/include/configs/rockchip-common.h
+index 5d6e35f91f..edff0f82b0 100644
+--- a/include/configs/rockchip-common.h
++++ b/include/configs/rockchip-common.h
+@@ -75,9 +75,9 @@
+ #endif
+ 
+ #define BOOT_TARGET_DEVICES(func) \
++	BOOT_TARGET_USB(func) \
+ 	BOOT_TARGET_MMC(func) \
+ 	BOOT_TARGET_RKNAND(func) \
+-	BOOT_TARGET_USB(func) \
+ 	BOOT_TARGET_PXE(func) \
+ 	BOOT_TARGET_DHCP(func)
+ 
+-- 
+2.25.1
+
